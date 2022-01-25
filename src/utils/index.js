@@ -10,10 +10,10 @@ export const downLoadTemplate = (templateName, projectName = initProjectName) =>
   return new Promise((resolve, reject) => {
     downFromGit(api, projectName, (err) => {
       if(err) {
-        reject({
+        reject(new Error({
           success: false,
           message: err
-        });
+        }));
       }
       resolve({
         success: true,
@@ -33,3 +33,7 @@ export const removeDirector = (src) => {
   fsSync.remove(src);
 }
 
+// 读取json文件
+export const readJSON = (src) => {
+  return fsSync.readJSON(src)
+}
