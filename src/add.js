@@ -2,10 +2,10 @@
 import inquirer from 'inquirer';
 import chalk from 'chalk';
 import ora from 'ora';
-import { downLoadTemplate, copyDirector, removeDirector } from './utils';
+import { downLoadTemplate, copyDirector, removeDirector, readJSON } from './utils';
 import { RE_NAME, initProjectName } from './config/constants';
 
-const { readFileSync, writeFileSync } = require('fs')
+const { readFileSync, writeFileSync, existsSync } = require('fs')
 
 const questions = [
   {
@@ -60,13 +60,42 @@ const validateName = (name) => {
 // 新增组件
 const addComponent = (answer) => {
   const { name } = answer;
-  // const packagePath = `${process.cwd()}/package.json`;
-  // const packageJson = readJSON(packagePath);
-  // const packageName = packageJson.name;
+  const packagePath = `${process.cwd()}/package.json`;
+
+  if(!existsSync(packagePath)){
+    console.log(chalk.red('\n无法找到package.json文件'));
+    removeDirector(initProjectName);
+    return;
+  }
+
+  const packageJson = readJSON(packagePath);
+  const packageName = packageJson.name;
+  
+  // 修改组件模版
   let fileTsx = readFileSync(`${initProjectName}/template-component/component/index.tsx`).toString();
   fileTsx = fileTsx.replace(/FileName/ig, name);
   writeFileSync(`${initProjectName}/template-component/component/index.tsx`, fileTsx, 'utf-8');
+  // 修改组件demo模版
+  let demoMd = readFileSync(`${initProjectName}/template-component/demo/usage.md`).toString();
+  demoMd = demoMd.replace(/FileName/ig, name);
+  demoMd = demoMd.replace(/packageName/ig, packageName);
+  writeFileSync(`${initProjectName}/template-component/demo/usage.md`, demoMd, 'utf-8');
+  // 透出组件
+  if(!existsSync(`${process.cwd()}/src/index.ts`)){
+    console.log(chalk.red(`\n不存在文件路径：${process.cwd()}/src/index.ts`));
+    removeDirector(initProjectName);
+    return;
+  }
+  let exportFile = readFileSync(`${process.cwd()}/src/index.ts`).toString();
+  exportFile += `\nexport { default as ${name} } from './components/${name}';`
+  writeFileSync(`${process.cwd()}/src/index.ts`, exportFile, 'utf-8');
+  
+  // 拷贝模版
   copyDirector(`${initProjectName}/template-component/component`, `src/components/${name}`);
+  copyDirector(`${initProjectName}/template-component/demo`, `demo/${name}`);
+
+  // 删除downLoad的工程
+  removeDirector(initProjectName);
 }
 
 // 新增页面
