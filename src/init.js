@@ -1,4 +1,4 @@
-import ora from 'ora';
+import ora from "ora";
 import chalk from 'chalk';
 import { downLoadTemplate, copyDirector, removeDirector } from './utils/index';
 import { initProjectName } from './config/constants';
