@@ -14,7 +14,6 @@ const init = async (type, projectName) => {
   }
 
   const spinner = ora('正在初始化项目模版').start();
-  spinner.color = 'green';
   
   downLoadTemplate(`template-${type}`, initProjectName, () => spinner.stop()).then(res => {
     console.log('init', res);
@@ -31,4 +30,4 @@ const init = async (type, projectName) => {
   });
 }
 
-module.exports =  init
+module.exports = init

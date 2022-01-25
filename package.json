@@ -9,7 +9,9 @@
   "scripts": {
     "compile": "babel src -d build",
     "build": "npm run compile",
-    "watch": "npm run compile -- --watch"
+    "watch": "npm run compile -- --watch",
+    "f2elint-scan": "f2elint scan",
+    "f2elint-fix": "f2elint fix"
   },
   "keywords": [],
   "author": "",
@@ -26,5 +28,14 @@
     "npm": "^8.3.2",
     "ora": "^5.4.1",
     "shelljs": "^0.8.4"
+  },
+  "devDependencies": {
+    "f2elint": "^2.2.0"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "f2elint commit-file-scan",
+      "commit-msg": "f2elint commit-msg-scan"
+    }
   }
 }
